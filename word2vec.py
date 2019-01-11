@@ -45,7 +45,7 @@ class Word2Vec:
         self.skip_gram_model = SkipGramModel(self.emb_size, self.emb_dimension)
         self.use_cuda = torch.cuda.is_available()
         if self.use_cuda:
-            self.skip_gram_model.cuda()
+            nn.DataParallel(self.skip_gram_model.cuda())
         self.optimizer = optim.SGD(
             self.skip_gram_model.parameters(), lr=self.initial_lr)
 
