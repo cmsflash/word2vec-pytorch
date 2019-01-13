@@ -9,15 +9,18 @@ from tqdm import tqdm
 import sys
 
 
+batch_size = 16384 
+
+
 class Word2Vec:
     def __init__(self,
                  input_file_name,
                  output_file_name,
                  emb_dimension=100,
-                 batch_size=50,
+                 batch_size=batch_size,
                  window_size=5,
                  iteration=1,
-                 initial_lr=0.025,
+                 initial_lr=0.025 * 50,
                  min_count=5):
         """Initilize class parameters.
 
@@ -45,7 +48,8 @@ class Word2Vec:
         self.skip_gram_model = SkipGramModel(self.emb_size, self.emb_dimension)
         self.use_cuda = torch.cuda.is_available()
         if self.use_cuda:
-            self.skip_gram_model.cuda()
+            print('Use CUDA')
+            nn.DataParallel(self.skip_gram_model.cuda())
         self.optimizer = optim.SGD(
             self.skip_gram_model.parameters(), lr=self.initial_lr)
 
