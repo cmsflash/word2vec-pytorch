@@ -9,6 +9,4 @@ zhihu:
 en:
 	python3 word2vec.py en.txt embedding_en.txt
 
-
 .PHONY: 100 zhihu en all
-
