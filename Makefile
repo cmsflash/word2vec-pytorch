@@ -1,3 +1,5 @@
+all: 100
+
 100:
 	python3 word2vec.py zhihu_100.txt embedding_100.txt
 
@@ -10,5 +12,4 @@ en:
 zh:
 	python3 word2vec_reproduction.py zh.txt embedding_zh.txt
 
-.PHONY: 100 en
-
+.PHONY: 100 zhihu en zh all
