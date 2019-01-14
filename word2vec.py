@@ -16,6 +16,7 @@ class Word2Vec:
     def __init__(self,
                  input_file_name,
                  output_file_name,
+                 wordsim_file_name,
                  emb_dimension=100,
                  batch_size=batch_size,
                  window_size=5,
@@ -53,6 +54,14 @@ class Word2Vec:
         self.optimizer = optim.SGD(
             self.skip_gram_model.parameters(), lr=self.initial_lr)
 
+        # Load in wordsim verification file
+        self.wordsim_verification_tuples = []
+        with open(wordsim_file_name, 'r') as f:
+            f.readline() # Abandon header
+            for line in f:
+                word1, word2, actual_similarity = line.split(',')
+                self.wordsim_verification_tuples.add((word1, word2, float(actual_similarity)))
+
     def train(self):
         """Multiple training.
 
@@ -88,6 +97,8 @@ class Word2Vec:
                                         (loss.item(),
                                          self.optimizer.param_groups[0]['lr']))
             if i * self.batch_size % 100000 == 0:
+                spearman_rho = self.skip_gram_model.verify_on_wordsim(self.data.id2word, self.wordsim_verification_tuples)
+                print(f'Spearman\' rho: {spearman_rho}')
                 lr = self.initial_lr * (1.0 - 1.0 * i / batch_count)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = lr
@@ -96,5 +107,5 @@ class Word2Vec:
 
 
 if __name__ == '__main__':
-    w2v = Word2Vec(input_file_name=sys.argv[1], output_file_name=sys.argv[2])
+    w2v = Word2Vec(input_file_name=sys.argv[1], output_file_name=sys.argv[2], wordsim_file_name=sys.argv[3])
     w2v.train()

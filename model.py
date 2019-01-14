@@ -2,6 +2,8 @@ import torch
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+import scipy.stats
 
 
 class SkipGramModel(nn.Module):
@@ -69,6 +71,26 @@ class SkipGramModel(nn.Module):
         neg_score = torch.bmm(neg_emb_v, emb_u.unsqueeze(2)).squeeze()
         neg_score = F.logsigmoid(-1 * neg_score)
         return -1 * (torch.mean(score)+torch.mean(neg_score))
+
+    def verify_on_wordsim(self, id2word, wordsim_verification_tuples):
+        predicted_similarities = []
+        actual_similarities = []
+
+        word2id = {word:id_ for id_, word in id2word.items()}
+
+        for word1, word2, actual_similarity in wordsim_verification_tuples:
+            if (word1 not in word2id) or (word2 not in word2id):
+                continue
+            embedding1 = embedding[word2id[word1]]
+            embedding2 = embedding[word2id[word2]]
+            predicted_similarity = np.dot(embedding1, embedding2)/(np.linalg.norm(embedding1)*np.linalg.norm(embedding2))
+
+            predicted_similarities.append(predicted_similarity)
+            actual_similarities.append(actual_similarity)
+
+        spearman_rho, _ = scipy.stats.spearmanr(actual_similarities, predicted_similarities)
+
+        return spearman_rho
 
     def save_embedding(self, id2word, file_name, use_cuda):
         """Save all embeddings to file.
