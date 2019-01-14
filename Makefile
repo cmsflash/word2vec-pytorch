@@ -7,6 +7,8 @@ zhihu:
 en:
 	python3 word2vec.py en.txt embedding_en.txt
 
+zh:
+	python3 word2vec_reproduction.py zh.txt embedding_zh.txt
 
 .PHONY: 100 en
 
