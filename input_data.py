@@ -1,5 +1,8 @@
 import numpy
 from collections import deque
+from tqdm import tqdm
+
+
 numpy.random.seed(12345)
 
 
@@ -27,7 +30,9 @@ class InputData:
         self.sentence_length = 0
         self.sentence_count = 0
         word_frequency = dict()
-        for line in self.input_file:
+        total=sum(1 for line in open(self.input_file_name))
+        print(total)
+        for line in tqdm(self.input_file, total=total, unit='lines'):
             self.sentence_count += 1
             line = line.strip().split(' ')
             self.sentence_length += len(line)
