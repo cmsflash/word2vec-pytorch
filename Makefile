@@ -10,6 +10,6 @@ en:
 	python3 word2vec.py en.txt embedding_en.txt
 
 zh:
-	python3 word2vec_reproduction.py zh.txt embedding_zh.txt
+	python3 word2vec_reproduction.py zh.txt embedding_zh.txt chinese-297.txt
 
 .PHONY: 100 zhihu en zh all

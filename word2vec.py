@@ -60,7 +60,7 @@ class Word2Vec:
             f.readline() # Abandon header
             for line in f:
                 word1, word2, actual_similarity = line.split(',')
-                self.wordsim_verification_tuples.add((word1, word2, float(actual_similarity)))
+                self.wordsim_verification_tuples.append((word1, word2, float(actual_similarity)))
 
     def train(self):
         """Multiple training.
@@ -97,8 +97,8 @@ class Word2Vec:
                                         (loss.item(),
                                          self.optimizer.param_groups[0]['lr']))
             if i * self.batch_size % 100000 == 0:
-                spearman_rho = self.skip_gram_model.verify_on_wordsim(self.data.id2word, self.wordsim_verification_tuples)
-                print(f'Spearman\' rho: {spearman_rho}')
+                spearman_rho = self.skip_gram_model.verify_on_wordsim(self.data.id2word, self.wordsim_verification_tuples, self.use_cuda)
+                print(f'Spearman\'s rho: {spearman_rho}')
                 lr = self.initial_lr * (1.0 - 1.0 * i / batch_count)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = lr

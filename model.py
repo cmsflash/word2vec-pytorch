@@ -72,7 +72,12 @@ class SkipGramModel(nn.Module):
         neg_score = F.logsigmoid(-1 * neg_score)
         return -1 * (torch.mean(score)+torch.mean(neg_score))
 
-    def verify_on_wordsim(self, id2word, wordsim_verification_tuples):
+    def verify_on_wordsim(self, id2word, wordsim_verification_tuples, use_cuda):
+        if use_cuda:
+            embedding = self.u_embeddings.weight.cpu().data.numpy()
+        else:
+            embedding = self.u_embeddings.weight.data.numpy()
+
         predicted_similarities = []
         actual_similarities = []
 
