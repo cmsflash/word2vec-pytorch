@@ -8,6 +8,8 @@ import torch.optim as optim
 from tqdm import tqdm
 import sys
 
+from utils import dump_embedding
+
 
 batch_size = 50 
 
@@ -17,17 +19,17 @@ class Word2Vec:
     def __init__(
             self, input_path, output_path, dimension=100,
             batch_size=batch_size, window_size=5, epoch_count=10,
-            initial_lr=1.25, min_count=5
+            initial_lr=2.5, min_count=5
         ):
         self.data = InputData(input_path, min_count)
         self.output_path = output_path
-        self.word_count = len(self.data.id_from_word)
+        self.vocabulary_size = len(self.data.id_from_word)
         self.dimension = dimension
         self.batch_size = batch_size
         self.window_size = window_size
         self.epoch_count = epoch_count
         self.initial_lr = initial_lr
-        self.model = SkipGramModel(self.word_count, self.dimension)
+        self.model = SkipGramModel(self.vocabulary_size, self.dimension)
         if torch.cuda.is_available():
             self.device = torch.device('cuda')
         else:
@@ -63,7 +65,8 @@ class Word2Vec:
                 lr = self.initial_lr * (1.0 - 1.0 * i / batch_count)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = lr
-        self.model.module.save_embedding(
+        dump_embedding(
+            self.model.module.get_embedding(), self.model.module.dimension,
             self.data.word_from_id, self.output_path
         )
 
