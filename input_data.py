@@ -1,9 +1,9 @@
 import numpy
 from collections import deque, defaultdict
+from tqdm import tqdm
 
 
 SAMPLE_TABLE_SIZE = int(1e8)
-
 numpy.random.seed(12345)
 
 
@@ -20,7 +20,8 @@ class InputData:
         self.word_count = 0
         self.sentence_count = 0
         frequencies = defaultdict(lambda: 0)
-        for line in self.input_file:
+        total=sum(1 for line in open(self.input_file_name))
+        for line in tqdm(self.input_file, total=total, unit='lines'):
             self.sentence_count += 1
             line = line.strip().split(' ')
             self.word_count += len(line)
