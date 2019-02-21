@@ -1,15 +1,18 @@
 all: 100
 
 100:
-	python3 word2vec.py zhihu_100.txt embedding_100.txt
+	./run.sh 100 zhihu_100.txt
 
 zhihu:
-	python3 word2vec.py zhihu.txt embedding_zhihu.txt
+	./run.sh zhihu zhihu.txt
 
 en:
-	python3 word2vec.py en.txt embedding_en.txt
+	./run.sh en en.txt
 
 zh:
-	python3 word2vec_reproduction.py zh.txt embedding_zh.txt chinese-297.txt
+	./run.sh zh zh.txt
+
+char:
+	./run.sh char char.txt
 
 .PHONY: 100 zhihu en zh all
