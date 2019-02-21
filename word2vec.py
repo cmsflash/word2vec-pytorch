@@ -1,3 +1,4 @@
+from os import path as osp
 from input_data import InputData
 import numpy
 from model import SkipGramModel
@@ -9,25 +10,24 @@ from tqdm import tqdm
 import sys
 
 
-batch_size = 16384 
+batch_size = 50
 
 
 class Word2Vec:
     def __init__(self,
                  input_file_name,
-                 output_file_name,
-                 wordsim_file_name,
+                 output_dir,
                  emb_dimension=100,
                  batch_size=batch_size,
                  window_size=5,
-                 iteration=1,
+                 iteration=3,
                  initial_lr=0.025 * 50,
-                 min_count=5):
+                 min_count=10):
         """Initilize class parameters.
 
         Args:
             input_file_name: Name of a text data from file. Each line is a sentence splited with space.
-            output_file_name: Name of the final embedding file.
+            output_dir: Name of the final embedding file.
             emb_dimention: Embedding dimention, typically from 50 to 500.
             batch_size: The count of word pairs for one forward.
             window_size: Max skip length between words.
@@ -39,7 +39,7 @@ class Word2Vec:
             None.
         """
         self.data = InputData(input_file_name, min_count)
-        self.output_file_name = output_file_name
+        self.output_dir = output_dir
         self.emb_size = len(self.data.word2id)
         self.emb_dimension = emb_dimension
         self.batch_size = batch_size
@@ -54,14 +54,6 @@ class Word2Vec:
         self.optimizer = optim.SGD(
             self.skip_gram_model.parameters(), lr=self.initial_lr)
 
-        # Load in wordsim verification file
-        self.wordsim_verification_tuples = []
-        with open(wordsim_file_name, 'r') as f:
-            f.readline() # Abandon header
-            for line in f:
-                word1, word2, actual_similarity = line.split(',')
-                self.wordsim_verification_tuples.append((word1, word2, float(actual_similarity)))
-
     def train(self):
         """Multiple training.
 
@@ -71,8 +63,10 @@ class Word2Vec:
         pair_count = self.data.evaluate_pair_count(self.window_size)
         batch_count = self.iteration * pair_count / self.batch_size
         process_bar = tqdm(range(int(batch_count)))
+
         # self.skip_gram_model.save_embedding(
         #     self.data.id2word, 'begin_embedding.txt', self.use_cuda)
+        min_loss = float('inf')
         for i in process_bar:
             pos_pairs = self.data.get_batch_pairs(self.batch_size,
                                                   self.window_size)
@@ -96,16 +90,17 @@ class Word2Vec:
             process_bar.set_description("Loss: %0.8f, lr: %0.6f" %
                                         (loss.item(),
                                          self.optimizer.param_groups[0]['lr']))
-            if i * self.batch_size % 100000 == 0:
-                spearman_rho = self.skip_gram_model.verify_on_wordsim(self.data.id2word, self.wordsim_verification_tuples, self.use_cuda)
-                print(f'Spearman\'s rho: {spearman_rho}')
+            if i * 50 % 100000 == 0:
                 lr = self.initial_lr * (1.0 - 1.0 * i / batch_count)
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = lr
-        self.skip_gram_model.save_embedding(
-            self.data.id2word, self.output_file_name, self.use_cuda)
+                if i * 50 % 100000000 == 0:
+                    self.skip_gram_model.save_embedding(
+                        self.data.id2word, osp.join(self.output_dir, f'{i}.txt'), self.use_cuda
+                    )
 
 
 if __name__ == '__main__':
-    w2v = Word2Vec(input_file_name=sys.argv[1], output_file_name=sys.argv[2], wordsim_file_name=sys.argv[3])
+    w2v = Word2Vec(input_file_name=sys.argv[1], output_dir=sys.argv[2])
     w2v.train()
+
