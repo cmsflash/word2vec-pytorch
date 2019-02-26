@@ -38,6 +38,13 @@ class Word2Vec:
         self.model = nn.DataParallel(self.model.to(self.device))
         self.optimizer = optim.SGD(self.model.parameters(), lr=self.initial_lr)
 
+        self.wordsim_verification_tuples = []
+        with open('chinese-297.txt', 'r') as f:
+            f.readline() # Abandon header
+            for line in f:
+                word1, word2, actual_similarity = line.split(',')
+                self.wordsim_verification_tuples.append((word1, word2, float(actual_similarity)))
+
     def train(self):
         pair_count = self.data.get_pair_count(self.window_size)
         batch_count = self.epoch_count * pair_count / self.batch_size
@@ -70,6 +77,9 @@ class Word2Vec:
             self.model.module.get_embedding(), self.model.module.dimension,
             self.data.word_from_id, self.output_path
         )
+        print(f'''Spearman\'s rho={self.model.module.get_wordsim_rho(
+            self.wordsim_verification_tuples, self.data.id_from_word
+        )}''')
 
 
 if __name__ == '__main__':
