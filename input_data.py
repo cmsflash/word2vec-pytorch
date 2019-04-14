@@ -13,8 +13,10 @@ class InputData:
         self.input_path = path
         self.input_file = open(self.input_path)
         self.get_words(min_count)
+        print('Finished reading input file')
         self.word_pair_catch = deque()
         self.sample_table = self._create_sample_table()
+        print('Finished constructing sample table')
 
     def get_words(self, min_count):
         self.word_count = 0

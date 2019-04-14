@@ -15,4 +15,4 @@ zh:
 char:
 	./run.sh char char.txt
 
-.PHONY: 100 zhihu en zh all
+.PHONY: 100 zhihu en zh all char
