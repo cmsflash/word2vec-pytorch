@@ -1,13 +1,3 @@
-Word2vec-PyTorch
-====
+# OceanText
 
-> Warning: this repo is poseted two years ago and it's not compatible with the current pytorch (v1.0.0). I will update it as soon as possible
-
-This is the implementation of word2vec based on PyTorch.
-
-Run it with
-
-    python word2vec.py zhihu.txt word_embedding.txt
-
-
-I write a [blog](https://adoni.github.io/2017/11/08/word2vec-pytorch/) about the word2vec based on PyTorch.
+Implementation of OceanText, a visual embedding algorithm for Chinese. It is the final year project of [Shen Zhuoran](https://github.com/cmsflash) and [Yao Qinging](https://github.com/vvvfo).
