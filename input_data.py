@@ -1,9 +1,12 @@
-import numpy
 from collections import deque, defaultdict
+
+import numpy
 from tqdm import tqdm
 
 
 SAMPLE_TABLE_SIZE = int(1e8)
+
+
 numpy.random.seed(12345)
 
 
